@@ -1,19 +1,12 @@
 digraph {
 	fake [style=invisible]
 	"" [root=true]
-	a [shape=doublecircle]
-	bb
-	ab
-	abb [shape=doublecircle]
-	b
-	bba [shape=doublecircle]
-	bbb [shape=doublecircle]
+	aa [shape=doublecircle]
+	b [shape=doublecircle]
+	a
 	fake -> "" [style=bold]
-	"" -> a [label=a]
-	a -> ab [label=b]
-	ab -> abb [label=b]
 	"" -> b [label=b]
-	b -> bb [label=b]
-	bb -> bba [label=a]
-	bb -> bbb [label=b]
+	"" -> a [label=a]
+	a -> aa [label=a]
+	aa -> a [label=a]
 }
