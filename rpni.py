@@ -4,6 +4,7 @@ from PySimpleAutomata import automata_IO as IO
 from PySimpleAutomata import DFA as DFA
 import copy
 from unionfind import UnionFind
+from re_generator import generate
 
 def pta(s_plus):
     dfa = {
@@ -125,7 +126,15 @@ def rpni(s_plus, s_minus):
 
 
 if __name__ == "__main__":
-    s_plus = ["b", "aa", "aaaa"]
-    s_minus = ["", "a", "aaa", "baa"]
-    dfa, _ = rpni(s_plus, s_minus)
+    # s_plus = ["b", "aa", "aaaa"]
+    # s_minus = ["", "a", "aaa", "baa"]
+    # dfa, _ = rpni(s_plus, s_minus)
+
+    re = "hello!* are you okay?+ ye(p|a)+"
+
+    samples = []
+    for i in range(100):
+        samples.append(generate(re))
+    dfa, _ = rpni(samples, [])
+
     IO.dfa_to_dot(dfa, "dfa")
