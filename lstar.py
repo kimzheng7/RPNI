@@ -1,4 +1,21 @@
-def separable_check(T, S):
+def dict_to_s(dict):
+    return str(sorted(dict.items()))
+
+def format_table(T):
+    print("{:<15}".format("") + "|", end = "")
+    # columns
+    for key in sorted(T[""].keys()):
+        print("|" + "{:<15}".format(key) + "|", end = "")
+    print()
+
+    # rows
+    for row in T:
+        print("{:<15}".format(row) + "|", end = "")
+        for key in sorted(T[row].keys()):
+            print("|" + "{:<15}".format(int(T[row][key])) + "|", end = "")
+        print()
+
+def separable_check(T, S, alphabet):
     # checks that all prefix rows are different
     for prefix_one in S:
         for prefix_two in S:
@@ -6,7 +23,9 @@ def separable_check(T, S):
                 continue
             
             if T[prefix_one] == T[prefix_two]:
-                return False, prefix_one, prefix_two
+                for a in alphabet:
+                    if T[prefix_one + a] != T[prefix_two + a]:
+                        return False, prefix_one, prefix_two
             
     return True, None, None
 
@@ -28,21 +47,23 @@ def table_to_DFA(alphabet, S, E, T):
     # every prefix is a state
     states = []
     for pref in S:
-        states.append(pref)
+        if dict_to_s(T[pref]) not in states:
+            states.append(dict_to_s(T[pref]))
     # prefixes which are accepted are final states
     final_states = []
     for pref in S:
-        if T[pref][""]:
-            final_states.append(pref)
-    initial_state = ""
+        if T[pref][""] and dict_to_s(T[pref]) not in final_states:
+            final_states.append(dict_to_s(T[pref]))
+
+    initial_state = dict_to_s(T[""])
     # for each prefix, see the prefix + a which has the same row. add 'a' transition
     transition_function = {}
     for prefix_one in S:
-        transition_function[prefix_one] = {}
+        transition_function[dict_to_s(T[prefix_one])] = {}
         for a in alphabet:
             for prefix_two in S:
                 if T[prefix_one + a] == T[prefix_two]:
-                    transition_function[prefix_one][a] = prefix_two
+                    transition_function[dict_to_s(T[prefix_one])][a] = dict_to_s(T[prefix_two])
                     break
 
     return {
@@ -67,9 +88,12 @@ def lstar(alphabet, string_oracle, dfa_oracle):
         T[a] = {"" : string_oracle(a)}
 
     while True:
-        separable, nonsep_one, nonsep_two = separable_check(T, S)
+        separable, nonsep_one, nonsep_two = separable_check(T, S, alphabet)
         closed, nonclosed_prefix, nonclosed_symbol = closed_check(T, S, alphabet)
         while not (separable and closed):
+            print(S)
+            print(E)
+            format_table(T)
             if not separable:
                 # find a symbol which causes them to differ
                 for a in alphabet:
@@ -82,9 +106,7 @@ def lstar(alphabet, string_oracle, dfa_oracle):
                                     T[pref][a + suff] = string_oracle(pref + a + suff)
                                     for b in alphabet:
                                         T[pref + b][a + suff] = string_oracle(pref + b + a + suff)
-
                                 break
-
 
             if not closed:
                 # add the nonclosed row as a new prefix
@@ -102,28 +124,29 @@ def lstar(alphabet, string_oracle, dfa_oracle):
                     cols[suff] = string_oracle(nonclosed_prefix + nonclosed_symbol + suff)
                 T[nonclosed_prefix + nonclosed_symbol] = cols
 
-            separable, nonsep_one, nonsep_two = separable_check(T, S)
+            separable, nonsep_one, nonsep_two = separable_check(T, S, alphabet)
             closed, nonclosed_prefix, nonclosed_symbol = closed_check(T, S, alphabet)
 
         dfa = table_to_DFA(alphabet, S, E, T)
-        print(T)
-        print(dfa)
         equal, counterexample = dfa_oracle(dfa)
         if equal:
             break
+        print(counterexample)
+        format_table(T)
         for i in range(0, len(counterexample) + 1):
             S.add(counterexample[0 : i])
             # fill table with row prefix = counterexample[0 : i]
-            T[counterexample[0 : i]] = {}
+            if counterexample[0 : i] not in T:
+                T[counterexample[0 : i]] = {}
             for suff in E:
-                T[counterexample[0 : i]] = {suff : string_oracle(counterexample[0 : i] + suff)}
+                T[counterexample[0 : i]][suff] = string_oracle(counterexample[0 : i] + suff)
             # fill with prefix + a
             for a in alphabet:
-                T[counterexample[0 : i] + a] = {}
+                if (counterexample[0 : i] + a) not in T:
+                    T[counterexample[0 : i] + a] = {}
                 for suff in E:
-                    T[counterexample[0 : i] + a] = {suff : string_oracle(counterexample[0 : i] + a + suff)}
+                    T[counterexample[0 : i] + a][suff] = string_oracle(counterexample[0 : i] + a + suff)
                 
-
 
     return dfa
 
@@ -151,4 +174,5 @@ if __name__ == "__main__":
         return string_oracle, dfa_oracle
     
     string_oracle, dfa_oracle = generate_oracles("aba*")
-    lstar(set("abc"), string_oracle, dfa_oracle)
+    dfa = lstar(set("abc"), string_oracle, dfa_oracle)
+    print(dfa_to_regex.dfa_to_regex(dfa))
