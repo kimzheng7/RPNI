@@ -15,8 +15,15 @@ def format_table(T):
             print("|" + "{:<15}".format(int(T[row][key])) + "|", end = "")
         print()
 
+def dfa_membership(dfa, string):
+    curr_state = dfa["initial_state"]
+    for c in string:
+        curr_state = dfa["transition_function"][curr_state][c]
+
+    return curr_state in dfa["final_states"]
+
 def separable_check(T, S, alphabet):
-    # checks that all prefix rows are different
+    # checks that all prefix rows are different (if any 2 same, then prefix + a rows same too)
     for prefix_one in S:
         for prefix_two in S:
             if prefix_one == prefix_two:
@@ -58,13 +65,12 @@ def table_to_DFA(alphabet, S, E, T):
     initial_state = dict_to_s(T[""])
     # for each prefix, see the prefix + a which has the same row. add 'a' transition
     transition_function = {}
-    for prefix_one in S:
-        transition_function[dict_to_s(T[prefix_one])] = {}
+    for pref in S:
         for a in alphabet:
-            for prefix_two in S:
-                if T[prefix_one + a] == T[prefix_two]:
-                    transition_function[dict_to_s(T[prefix_one])][a] = dict_to_s(T[prefix_two])
-                    break
+            if dict_to_s(T[pref]) not in transition_function:
+                transition_function[dict_to_s(T[pref])] = {a : dict_to_s(T[pref + a])}
+            else:
+                transition_function[dict_to_s(T[pref])][a] = dict_to_s(T[pref + a])
 
     return {
         "states" : states,
@@ -91,9 +97,6 @@ def lstar(alphabet, string_oracle, dfa_oracle):
         separable, nonsep_one, nonsep_two = separable_check(T, S, alphabet)
         closed, nonclosed_prefix, nonclosed_symbol = closed_check(T, S, alphabet)
         while not (separable and closed):
-            print(S)
-            print(E)
-            format_table(T)
             if not separable:
                 # find a symbol which causes them to differ
                 for a in alphabet:
@@ -131,8 +134,7 @@ def lstar(alphabet, string_oracle, dfa_oracle):
         equal, counterexample = dfa_oracle(dfa)
         if equal:
             break
-        print(counterexample)
-        format_table(T)
+        
         for i in range(0, len(counterexample) + 1):
             S.add(counterexample[0 : i])
             # fill table with row prefix = counterexample[0 : i]
@@ -147,14 +149,13 @@ def lstar(alphabet, string_oracle, dfa_oracle):
                 for suff in E:
                     T[counterexample[0 : i] + a][suff] = string_oracle(counterexample[0 : i] + a + suff)
                 
-
     return dfa
 
 if __name__ == "__main__":
     import re
     from automata_toolkit import dfa_to_regex
+    from automata_toolkit import visual_utils
     from re_generator import generate
-
 
     def generate_oracles(regex):
         def string_oracle(string):
@@ -162,17 +163,20 @@ if __name__ == "__main__":
             return res is not None
         
         def dfa_oracle(dfa):
-            regex_ = dfa_to_regex.dfa_to_regex(dfa)
-            for i in range(100):
+            for _ in range(100):
                 string = generate(regex)
-                res = re.fullmatch(regex_, string)
-                if res is None:
+                res = dfa_membership(dfa, string)
+                if not res:
                     return False, string
                 
             return True, None
         
         return string_oracle, dfa_oracle
     
-    string_oracle, dfa_oracle = generate_oracles("aba*")
-    dfa = lstar(set("abc"), string_oracle, dfa_oracle)
-    print(dfa_to_regex.dfa_to_regex(dfa))
+    alphabet = set("abc")
+    regex = "aba*"
+
+    string_oracle, dfa_oracle = generate_oracles(regex)
+    dfa = lstar(alphabet, string_oracle, dfa_oracle)
+    # visual_utils.draw_dfa(dfa)
+    print(dfa_to_regex.dfa_to_regex(dfa)) # Function is buggy

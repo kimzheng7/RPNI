@@ -9,7 +9,6 @@ def extend_string(curr_str, curr_chars):
 
     return curr_str + next_char
 
-
 def generate(re):
     generated_string = ""
     special_chars = ["*", "+"]
