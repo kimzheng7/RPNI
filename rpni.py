@@ -132,9 +132,10 @@ if __name__ == "__main__":
 
     re = "hello!* are you okay?+ ye(p|a)+"
 
-    samples = []
+    pos_samples = []
+    neg_samples = []
     for i in range(100):
-        samples.append(generate(re))
-    dfa, _ = rpni(samples, [])
+        pos_samples.append(generate(re))
+    dfa, _ = rpni(pos_samples, neg_samples)
 
     IO.dfa_to_dot(dfa, "dfa")
