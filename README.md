@@ -2,6 +2,7 @@ Dependencies are
 - `pysimpleautomata`
 - `pyunionfind`
 - `automata-toolkit`
+
 `pip install` all of these before beginning 
 
 To run RPNI, go to rpni.py, and change the `re` variable. The program will generate positive examples of the regular expression.
