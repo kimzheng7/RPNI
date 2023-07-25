@@ -42,7 +42,7 @@ def compare(dfa, true_regex):
     true_pos = 0
     false_pos = 0
     false_neg = 0
-    for _ in range(1000):
+    for _ in range(100):
         string = getone(true_regex)
         match = re.fullmatch(hypothesis_regex, string) is not None
         if match:
@@ -50,7 +50,7 @@ def compare(dfa, true_regex):
         else:
             false_neg += 1
 
-    for _ in range(1000):
+    for _ in range(100):
         string = getone(hypothesis_regex)
         match = re.fullmatch(true_regex, string) is not None
         if match:
@@ -78,7 +78,7 @@ def assessment(regex, alphabet):
         return match
     
     def dfa_oracle(dfa):
-        for _ in range(500):
+        for _ in range(100):
             string = getone(regex)
             res = dfa_membership(dfa, string)
             if not res:
@@ -99,4 +99,4 @@ def assessment(regex, alphabet):
     print("RPNI Score:", compare(rpni_dfa, regex))
 
 if __name__ == "__main__":
-    assessment("(a|b)*", set("abc"))
+    assessment("^(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", set("0123456789."))

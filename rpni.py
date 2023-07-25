@@ -3,6 +3,7 @@
 from PySimpleAutomata import automata_IO as IO
 from PySimpleAutomata import DFA as DFA
 import copy
+import time
 from unionfind import UnionFind
 from re_generator import generate
 
@@ -37,6 +38,7 @@ def quotient_automaton(dfa, new_partition, non_det):
     Each block = a new state, and the behaviour of each block is inherited from
     the states within the block
     """
+    print(time.asctime())
     new_dfa = {
         "alphabet" : dfa["alphabet"],
         "states" : set(),
@@ -46,14 +48,14 @@ def quotient_automaton(dfa, new_partition, non_det):
     }
 
     # Set representative from each partition block as the states
-    for block in new_partition.components():
-        new_dfa["states"].add(sorted(list(block))[0])
+    for block in new_partition.components_list():
+        new_dfa["states"].add(block[0])
 
     # Set the initial state to be the block containing the original initial state
     # and the final states to be the blocks containing the original final states
-    new_dfa["initial_state"] = sorted(list(new_partition.component(dfa["initial_state"])))[0]
+    new_dfa["initial_state"] = new_partition.component(dfa["initial_state"])[0]
     for state in dfa["accepting_states"]:
-        new_dfa["accepting_states"].add(sorted(list(new_partition.component(state)))[0])
+        new_dfa["accepting_states"].add(new_partition.component(state)[0])
 
     # Inherit transitions
     non_determinism = False
@@ -61,8 +63,8 @@ def quotient_automaton(dfa, new_partition, non_det):
         old_state, char = key
 
         # Find the blocks which contain old_state and new_state
-        old_block = sorted(list(new_partition.component(old_state)))[0]
-        new_block = sorted(list(new_partition.component(new_state)))[0]
+        old_block = new_partition.component(old_state)[0]
+        new_block = new_partition.component(new_state)[0]
 
         if non_det:
             if (old_block, char) not in new_dfa["transitions"]:
