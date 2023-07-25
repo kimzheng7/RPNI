@@ -36,7 +36,7 @@ def rpni_dfa_reformat(dfa):
         
 def compare(dfa, true_regex):
     """Gets the F-score"""
-    hypothesis_regex = dfa_to_regex.dfa_to_regex(dfa)
+    hypothesis_regex = dfa_to_regex.dfa_to_regex(dfa).replace("+", "|")
     print(hypothesis_regex)
 
     true_pos = 0
@@ -99,4 +99,4 @@ def assessment(regex, alphabet):
     print("RPNI Score:", compare(rpni_dfa, regex))
 
 if __name__ == "__main__":
-    assessment("^(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", set("0123456789."))
+    assessment("aa*", set("ab"))
