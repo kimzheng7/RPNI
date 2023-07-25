@@ -1,18 +1,14 @@
 digraph {
 	fake [style=invisible]
-	"" [root=true shape=doublecircle]
+	"" [root=true]
+	a
+	aaab
+	aaabc [shape=doublecircle]
 	fake -> "" [style=bold]
-	"" -> "" [label=h]
-	"" -> "" [label=e]
-	"" -> "" [label=l]
-	"" -> "" [label=o]
-	"" -> "" [label="!"]
-	"" -> "" [label=" "]
-	"" -> "" [label=a]
-	"" -> "" [label=r]
-	"" -> "" [label=y]
-	"" -> "" [label=u]
-	"" -> "" [label=k]
-	"" -> "" [label="?"]
-	"" -> "" [label=p]
+	"" -> a [label=a]
+	a -> a [label=a]
+	a -> aaab [label=b]
+	aaab -> aaabc [label=c]
+	aaabc -> aaabc [label=c]
+	aaab -> aaab [label=b]
 }

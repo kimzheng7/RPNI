@@ -6,9 +6,9 @@ import copy
 from unionfind import UnionFind
 from re_generator import generate
 
-def pta(s_plus):
+def pta(alphabet, s_plus):
     dfa = {
-        "alphabet" : set(),
+        "alphabet" : alphabet,
         "states" : set(),
         "initial_state" : "",
         "accepting_states" : set(),
@@ -78,9 +78,9 @@ def quotient_automaton(dfa, new_partition, non_det):
 
     return new_dfa, non_determinism
         
-def rpni(s_plus, s_minus):
+def rpni(alphabet, s_plus, s_minus):
     # Step 1: Construct the Prefix Tree Acceptor
-    dfa = pta(s_plus)
+    dfa = pta(alphabet, s_plus)
     states = list(dfa["states"])
     states.sort()
     states.sort(key = len)
@@ -126,16 +126,32 @@ def rpni(s_plus, s_minus):
 
 
 if __name__ == "__main__":
+    import rstr
+    import re
+    import random
+
     # s_plus = ["b", "aa", "aaaa"]
     # s_minus = ["", "a", "aaa", "baa"]
     # dfa, _ = rpni(s_plus, s_minus)
 
-    re = "hello!* are you okay?+ ye(p|a)+"
+    regex = "aa*bb*cc*"
+    any_re = "(a|b|c)*"
+    alphabet = set("abc")
 
     pos_samples = []
     neg_samples = []
     for i in range(100):
-        pos_samples.append(generate(re))
-    dfa, _ = rpni(pos_samples, neg_samples)
+        if random.choice([True, False]):
+            string = rstr.xeger(any_re)
+            if re.fullmatch(regex, string):
+                pos_samples.append(string)
+            else:
+                neg_samples.append(string)
+        else:
+            string = rstr.xeger(regex)
+            pos_samples.append
 
+    print(pos_samples)
+    print(neg_samples)
+    dfa, _ = rpni(alphabet, pos_samples, neg_samples)
     IO.dfa_to_dot(dfa, "dfa")
