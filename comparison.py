@@ -96,7 +96,7 @@ def assessment(regex, alphabet):
     print("L Star Regex: ")
     print("L Star FScore:", compare(lstar_dfa, regex))
     print("RPNI Regex: ")
-    print("RPNI Score:", compare(rpni_dfa, regex))
+    print("RPNI FScore:", compare(rpni_dfa, regex))
 
 if __name__ == "__main__":
-    assessment("aa*", set("ab"))
+    assessment("^(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", set("0123456789."))

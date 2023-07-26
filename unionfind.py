@@ -10,8 +10,7 @@ class UnionFind:
         if self.components[elem_one] == self.components[elem_two]:
             return
 
-        for element in self.components[elem_two]:
-            self.components[elem_one].append(element)
+        self.components[elem_one] += self.components[elem_two]
         for element in self.components[elem_one]:
             self.components[element] = self.components[elem_one]
 

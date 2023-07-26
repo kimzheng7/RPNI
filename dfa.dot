@@ -1,8 +1,10 @@
 digraph {
 	fake [style=invisible]
 	"" [root=true]
-	aa [shape=doublecircle]
+	aabbbbb [shape=doublecircle]
+	a
 	fake -> "" [style=bold]
-	"" -> aa [label=a]
-	aa -> aa [label=a]
+	"" -> a [label=a]
+	a -> aabbbbb [label=a]
+	aabbbbb -> aabbbbb [label=b]
 }
